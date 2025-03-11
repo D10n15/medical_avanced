@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Grupos de Seguridad -->
+    <record id="group_medical_admin" model="res.groups">
+        <field name="name">Medical Admin</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <record id="group_doctor" model="res.groups">
+        <field name="name">Doctor</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <record id="group_patient" model="res.groups">
+        <field name="name">Patient</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <!-- Regla de seguridad para que los doctores solo vean sus citas -->
+    <record id="rule_doctor_appointment" model="ir.rule">
+        <field name="name">Doctor can only see their appointments</field>
+        <field name="model_id" ref="model_medical_appointment"/>
+        <field name="domain_force">[('doctor_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_doctor'))]"/>
+        <field name="global" eval="True"/>
+    </record>
+
+    <!-- Regla de seguridad para que los pacientes solo vean sus citas -->
+    <record id="rule_patient_appointment" model="ir.rule">
+        <field name="name">Patient can only see their appointments</field>
+        <field name="model_id" ref="model_medical_appointment"/>
+        <field name="domain_force">[('patient_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_patient'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- Regla de seguridad para que los pacientes solo vean sus notificaciones -->
+    <record id="rule_patient_notification" model="ir.rule">
+        <field name="name">Patient can only see their notifications</field>
+        <field name="model_id" ref="model_medical_notification"/>
+        <field name="domain_force">[('patient_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_patient'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+</odoo>
+
+
+

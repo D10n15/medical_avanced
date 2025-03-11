@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Vista del Formulario para Notificaciones -->
+    <record id="view_notification_form" model="ir.ui.view">
+        <field name="name">notification.form</field>
+        <field name="model">medical.notification</field>
+        <field name="arch" type="xml">
+            <form string="Notification">
+                <sheet>
+                    <group>
+                        <field name="patient_id"/>
+                        <field name="appointment_id"/>
+                        <field name="message"/>
+                        <field name="status"/>
+                        <field name="date_sent"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista de Lista para Notificaciones -->
+    <record id="view_notification_list" model="ir.ui.view">
+        <field name="name">notification.list</field>
+        <field name="model">medical.notification</field>
+        <field name="arch" type="xml">
+            <list string="Notifications">
+                <field name="patient_id"/>
+                <field name="appointment_id"/>
+                <field name="message"/>
+                <field name="status"/>
+                <field name="date_sent"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Acción para Notificaciones -->
+    <record id="action_notification" model="ir.actions.act_window">
+        <field name="name">Notifications</field>
+        <field name="res_model">medical.notification</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_notification_list"/>
+    </record>
+
+    <!-- Menú para Notificaciones -->
+    <menuitem id="menu_notification" name="Notifications" parent="menu_medical_root" sequence="40"/>
+    <menuitem id="menu_notification_action" name="Manage Notifications" parent="menu_notification" action="action_notification"/>
+
+    <!-- Cron para Enviar Notificaciones -->
+    <record id="ir_cron_send_reminder_notifications" model="ir.cron">
+        <field name="name">Send Reminder Notifications</field>
+        <field name="model_id" ref="model_medical_notification"/>
+        <field name="state">code</field>
+        <field name="code">model.send_reminder_notifications()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Cron para Procesar Notificaciones Pendientes -->
+    <record id="ir_cron_process_pending_notifications" model="ir.cron">
+        <field name="name">Process Pending Notifications</field>
+        <field name="model_id" ref="model_medical_notification"/>
+        <field name="state">code</field>
+        <field name="code">model.process_pending_notifications()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Reglas de Seguridad -->
+    <record id="rule_medical_appointment_patient" model="ir.rule">
+        <field name="name">Patient Own Appointments</field>
+        <field name="model_id" ref="model_medical_appointment"/>
+        <field name="domain_force">['|', ('patient_id.user_id','=',user.id), ('patient_id','=',user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+</odoo>
+
+
+
+
